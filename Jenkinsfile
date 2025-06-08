@@ -54,20 +54,20 @@ pipeline{
                 script{
                    withDockerRegistry(credentialsId: 'docker-creds', toolName: 'docker'){   
                        sh "docker build -t swiggy ."
-                       sh "docker tag swiggy premd91/swiggy:latest "
-                       sh "docker push premd91/swiggy:latest "
+                       sh "docker tag swiggy kiranitth/swiggy:latest "
+                       sh "docker push kiranitth/swiggy:latest "
                     }
                 }
             }
         }
         stage("TRIVY"){
             steps{
-                sh "trivy image premd91/swiggy:latest > trivy.txt" 
+                sh "trivy image kiranitth/swiggy:latest > trivy.txt" 
             }
         }
         stage('Deploy to container'){
             steps{
-                sh 'docker run -d --name swiggy -p 3000:3000 premd91/swiggy:latest'
+                sh 'docker run -d --name swiggy -p 3000:3000 kiranitth/swiggy:latest'
             }
         }
     }
