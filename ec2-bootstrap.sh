@@ -1,20 +1,31 @@
 #!/bin/bash
 
-# Update packages
+echo "🔄 Updating system packages..."
+sudo apt update && sudo apt upgrade -y
+
+echo "🐳 Installing Docker..."
+sudo apt install -y ca-certificates curl gnupg lsb-release software-properties-common apt-transport-https
+
+# Add Docker’s GPG key
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+# Add Docker repo
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | \
+sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
 sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# Install Docker
-sudo apt install -y docker.io
+echo "👤 Adding user 'ubuntu' to Docker group..."
+sudo usermod -aG docker ubuntu
+newgrp docker
 
-# Enable and start Docker
-sudo systemctl enable docker
-sudo systemctl start docker
+echo "🔓 Setting Docker socket permissions..."
+sudo chmod 666 /var/run/docker.sock
 
-# Install Docker Compose plugin
-sudo apt install -y docker-compose-plugin
-
-# Add current user to docker group
-sudo usermod -aG docker $USER
-
-echo "✅ Docker & Docker Compose installed successfully."
-echo "🔁 Please log out and log back in or run 'newgrp docker' for group changes to apply."
+echo "✅ Docker installed successfully!"
+docker --version
